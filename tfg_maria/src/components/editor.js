@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import "./editor.css";
 import parseShex from '../parser/ShexParser'; 
-import {shExToXMI} from '../shumlex/main';
+// import {shExToXMI} from '../shumlex/main';
 
 function Editor() {
   const [shexInput, setShexInput] = useState('');
@@ -13,8 +13,8 @@ function Editor() {
 
   const parseShexInput = () => {
     try {
-      const parsedShEx = shExToXMI(shexInput);
-      // const parsedShEx = parseShex(shexInput);
+      // const parsedShEx = shExToXMI(shexInput);
+      const parsedShEx = parseShex(shexInput);
       setParseResult(parsedShEx);
     } catch (error) {
       console.error("Error al parsear ShEx:", error);
