@@ -1,9 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import "./editor.css";
 import parseShex from '../parser/ShexParser'; 
+import EditorYashe from './yashe';
+
 // import {shExToXMI} from '../shumlex/main';
 
 function Editor() {
+
+  useEffect(() => {
+    // WORKAROUND: Solución temporal a bug en librería Yashe (actualmente genera dos editores)
+    const yashes = document.querySelectorAll('.yashe');
+
+    if (yashes.length > 1) {
+      yashes[0].remove();
+    }
+  }, []); 
+
   const [shexInput, setShexInput] = useState('');
   const [parseResult, setParseResult] = useState('');
 
@@ -25,12 +37,9 @@ function Editor() {
   return (
     <div className='editor-container'>
       <h1>ShEx Parser</h1>
-      <textarea
-        className='editor'
-        value={shexInput}
-        onChange={handleShexInputChange}
-        placeholder="Ingresa aquí el código ShEx."
-      ></textarea>
+      <div className='editor'>
+        <EditorYashe/>
+      </div>
       <button className='button-20' onClick={parseShexInput}>Parsear</button>
 
       <div className="parse-result-container">
