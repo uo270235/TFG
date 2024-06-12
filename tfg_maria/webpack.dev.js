@@ -1,12 +1,23 @@
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  mode: 'development', // Change to 'production' for production builds
-  entry: './src/index.js', // Tu archivo de entrada
+  mode: 'development',
+  entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js'
+    filename: 'bundle.js',
+    publicPath: '/' // Cambia './public' a '/'
+  },
+  devServer: {
+    static: {
+      directory: path.join(__dirname, 'public'),
+    },
+    compress: true,
+    port: 3000,
+    historyApiFallback: true,
+    open: true,
   },
   resolve: {
     fallback: {
@@ -36,17 +47,17 @@ module.exports = {
         }
       },
       {
-        test: /\.css$/, // Regla para archivos CSS
+        test: /\.css$/,
         use: ['style-loader', 'css-loader']
       },
       {
-        test: /\.svg$/, // Regla para archivos SVG
+        test: /\.svg$/,
         use: [
           {
-            loader: 'file-loader', // Usa file-loader para SVG
+            loader: 'file-loader',
             options: {
-              name: '[name].[ext]', // Mantiene el nombre original del archivo y su extensión
-              outputPath: 'images/' // Directorio de salida para los archivos procesados
+              name: '[name].[ext]',
+              outputPath: 'images/'
             }
           }
         ]
@@ -57,6 +68,11 @@ module.exports = {
     new webpack.ProvidePlugin({
       process: 'process/browser',
       Buffer: ['buffer', 'Buffer']
+    }),
+    new HtmlWebpackPlugin({
+      template: './public/index.html',
+      filename: 'index.html',
+      publicPath: '/' // Añade esta línea para asegurar que HtmlWebpackPlugin use el mismo publicPath
     })
   ]
 };
