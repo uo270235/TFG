@@ -24,7 +24,7 @@ module.exports = {
       "fs": false,
       "tls": false,
       "net": false,
-      "path": require.resolve("path-browserify"),
+      "path":false,
       "zlib": require.resolve("browserify-zlib"),
       "http": require.resolve("stream-http"),
       "https": require.resolve("https-browserify"),
@@ -71,6 +71,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: './public/index.html',
+      favicon: './public/favicon.ico',
       filename: 'index.html',
       publicPath: '/' // Añade esta línea para asegurar que HtmlWebpackPlugin use el mismo publicPath
     })

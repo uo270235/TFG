@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import "./editor.css";
 import parseShex from '../parser/ShexParser'; 
-// import {shExToXMI} from '../shumlex/main';
+import {crearMUML} from '../../node_modules/shumlex/main';
 
 function Editor() {
   const [shexInput, setShexInput] = useState('');
