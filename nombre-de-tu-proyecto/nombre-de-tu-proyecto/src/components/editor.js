@@ -13,6 +13,22 @@ function Editor() {
     if (yashes.length > 1) {
       yashes[0].remove();
     }    
+    setTimeout(() => {
+      const example = `prefix : <http://example.org/>
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+
+:Usuario :Hombre and :Mujer or :kokin
+
+:Hombre {
+  :genero [ :Masculino ]
+}
+
+:Mujer {
+  :genero [ :Femenino ]
+}
+`;
+      editorRef.current.setYasheValue(example);
+    }, 1);
   }, []);
 
   const [shexInput, setShexInput] = useState('');
@@ -53,6 +69,7 @@ function Editor() {
     const parseShexInput = () => {
       try {
         const yasheValue = editorRef.current.getYasheValue();
+        
         // extractLogicShapes(yasheValue);
 
         //Generar XMI con valor del yashe
@@ -97,19 +114,12 @@ function Editor() {
 
   return (
     <>
-      <h1>ShEx Parser</h1>
       <div className='editor'>
         <EditorYashe ref={editorRef} />
       </div>
       <button className='button-20' onClick={() => extractLogicShapes(editorRef.current.getYasheValue())}>
         Ver Diagrama
       </button>
-      <div className="parse-result-container">
-        
-      </div>
-
-        {/* <svg id="svgid"></svg> */}
-      {/* {parseResult && <Diagram diagramSource={parseResult} />} */}
     </>
   );
 }

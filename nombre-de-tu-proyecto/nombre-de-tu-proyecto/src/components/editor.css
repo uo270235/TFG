@@ -49,10 +49,11 @@ h1 {
 }
 
 .button-20 {
+  margin-top: 2rem;
   padding: 10px 25px;
   font-size: 16px;
   color: #fff;
-  background-color: #007bff;
+  background-color:#1f425d;
   border: none;
   border-radius: 5px;
   cursor: pointer;

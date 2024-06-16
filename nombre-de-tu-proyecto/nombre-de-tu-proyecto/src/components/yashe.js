@@ -8,6 +8,9 @@ const EditorYashe = forwardRef((props, ref) => {
   useImperativeHandle(ref, () => ({
     getYasheValue: () => {
       return yashe ? yashe.getValue() : '';
+    },
+    setYasheValue: (value) => {
+       if(yashe) yashe.setValue(value);
     }
   }));
 
