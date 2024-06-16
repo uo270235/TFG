@@ -1,38 +1,39 @@
 class PlantUMLParser {
     constructor(shapes) {
-        this.shapes = shapes;
-        this.componentCounter = 0;
-        this.uml = `@startuml
-skinparam component {
-  BackgroundColor<<AND>> #1E3A8A
-  BorderColor<<AND>> #60A5FA
-  FontColor<<AND>> #E0F2FE
-
-  BackgroundColor<<NOT>> #F87171
-  BorderColor<<NOT>> #B91C1C
-  FontColor<<NOT>> #FFFFFF
-
-  BackgroundColor<<OR>> #065F46
-  BorderColor<<OR>> #6EE7B7
-  FontColor<<OR>> #D1FAE5
-}
-
-skinparam {
-  Shadowing true
-  RoundCorner 15
-}
-`;
+    this.shapes = shapes;
+    this.componentCounter = 0;
+    this.uml = `@startuml
+    skinparam component {
+    BackgroundColor<<AND>> #1E3A8A
+    BorderColor<<AND>> #60A5FA
+    FontColor<<AND>> #E0F2FE
+    
+    BackgroundColor<<NOT>> #F87171
+    BorderColor<<NOT>> #B91C1C
+    FontColor<<NOT>> #FFFFFF
+    
+    BackgroundColor<<OR>> #065F46
+    BorderColor<<OR>> #6EE7B7
+    FontColor<<OR>> #D1FAE5
     }
+    
+    skinparam {
+    Shadowing true
+    RoundCorner 15
+    }
+    `;
+    }
+    
 
     parseSentence(sentence) {
         sentence = sentence.replace(/\bAND\b/gi, 'AND')
             .replace(/\bOR\b/gi, 'OR')
             .replace(/\bNOT\b/gi, 'NOT');
-
+    
         const components = [];
         let currentComponent = '';
         let i = 0;
-
+    
         while (i < sentence.length) {
             if (sentence[i] === ' ') {
                 if (currentComponent) {
@@ -56,10 +57,10 @@ skinparam {
             }
         }
         if (currentComponent) components.push(currentComponent.replace(/:/g, '').trim());
-
+    
         return components;
     }
-
+    
     generatePlantUML(components) {
         const stack = [];
         const operatorStack = [];
@@ -70,7 +71,7 @@ skinparam {
             'AND': 2,
             'NOT': 3
         };
-
+    
         components.forEach(component => {
             if (component === 'AND' || component === 'OR' || component === 'NOT') {
                 while (operatorStack.length > 0 && precedence[operatorStack[operatorStack.length - 1]] >= precedence[component]) {
@@ -81,17 +82,17 @@ skinparam {
                 stack.push(component);
             }
         });
-
+    
         while (operatorStack.length > 0) {
             stack.push(operatorStack.pop());
         }
-
+    
         const declaredComponents = new Set();
-
+    
         // Declarar el mainEntity como un rectángulo
         this.uml += `rectangle ${mainEntity}\n`;
         declaredComponents.add(mainEntity);
-
+    
         // Declarar todos los componentes como rectángulos primero
         stack.forEach(component => {
             if (component !== 'AND' && component !== 'OR' && component !== 'NOT' && !declaredComponents.has(component)) {
@@ -99,13 +100,13 @@ skinparam {
                 declaredComponents.add(component);
             }
         });
-
+    
         const finalStack = [];
         stack.forEach(component => {
             if (component === 'AND' || component === 'OR' || component === 'NOT') {
                 const compName = `${component}_${this.componentCounter++}`;
                 this.uml += `component [ ] as ${compName} <<${component}>>\n`;
-
+    
                 if (component === 'NOT') {
                     const operand = finalStack.pop();
                     this.uml += `${compName} --> ${operand}\n`;
@@ -121,11 +122,11 @@ skinparam {
                 finalStack.push(component);
             }
         });
-
+    
         const finalComponent = finalStack.pop();
         this.uml += `${mainEntity} --> ${finalComponent}\n`;
     }
-
+    
     parse() {
         this.shapes.forEach(shape => {
             const components = this.parseSentence(shape);
@@ -134,7 +135,7 @@ skinparam {
         this.uml += '@enduml';
         return this.uml;
     }
-}
-
-// Exportar la clase
-module.exports = PlantUMLParser;
+    }
+    
+    // Exportar la clase
+    module.exports = PlantUMLParser;
