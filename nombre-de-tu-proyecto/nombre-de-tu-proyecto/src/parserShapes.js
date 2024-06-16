@@ -2,7 +2,26 @@ class PlantUMLParser {
     constructor(shapes) {
         this.shapes = shapes;
         this.componentCounter = 0;
-        this.uml = '@startuml\n';
+        this.uml = `@startuml
+skinparam component {
+  BackgroundColor<<AND>> #1E3A8A
+  BorderColor<<AND>> #60A5FA
+  FontColor<<AND>> #E0F2FE
+
+  BackgroundColor<<NOT>> #F87171
+  BorderColor<<NOT>> #B91C1C
+  FontColor<<NOT>> #FFFFFF
+
+  BackgroundColor<<OR>> #065F46
+  BorderColor<<OR>> #6EE7B7
+  FontColor<<OR>> #D1FAE5
+}
+
+skinparam {
+  Shadowing true
+  RoundCorner 15
+}
+`;
     }
 
     parseSentence(sentence) {
@@ -67,11 +86,25 @@ class PlantUMLParser {
             stack.push(operatorStack.pop());
         }
 
+        const declaredComponents = new Set();
+
+        // Declarar el mainEntity como un rectángulo
+        this.uml += `rectangle ${mainEntity}\n`;
+        declaredComponents.add(mainEntity);
+
+        // Declarar todos los componentes como rectángulos primero
+        stack.forEach(component => {
+            if (component !== 'AND' && component !== 'OR' && component !== 'NOT' && !declaredComponents.has(component)) {
+                this.uml += `rectangle ${component}\n`;
+                declaredComponents.add(component);
+            }
+        });
+
         const finalStack = [];
         stack.forEach(component => {
             if (component === 'AND' || component === 'OR' || component === 'NOT') {
                 const compName = `${component}_${this.componentCounter++}`;
-                this.uml += `component [${component}] as ${compName}\n`;
+                this.uml += `component [ ] as ${compName} <<${component}>>\n`;
 
                 if (component === 'NOT') {
                     const operand = finalStack.pop();
