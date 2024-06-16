@@ -1,9 +1,9 @@
-.app{
+/* .app{
   display: flex;
   flex-direction: column;
   gap: 2rem;
   text-align: center;
-}
+} */
 
 .editor{
   text-align: left;

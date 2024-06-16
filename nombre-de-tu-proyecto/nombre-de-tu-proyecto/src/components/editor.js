@@ -1,13 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import "./editor.css";
+import './editor.css';
 import EditorYashe from './yashe';
 import shumlex from 'shumlex';
-import InteractiveDiagram from './InteractiveDiagram';
-import YASHE from 'yashe';
-import Diagram from './Diagram';
 
-
-// import {shExToXMI} from '../shumlex/main';
 
 function Editor() {
   const editorRef = useRef(null);
@@ -15,51 +10,101 @@ function Editor() {
   useEffect(() => {
     // WORKAROUND: Solución temporal a bug en librería Yashe (actualmente genera dos editores)
     const yashes = document.querySelectorAll('.yashe');
-
     if (yashes.length > 1) {
       yashes[0].remove();
-    }
-  }, []); 
+    }    
+  }, []);
 
   const [shexInput, setShexInput] = useState('');
   const [parseResult, setParseResult] = useState('');
+  const [shexCleared, setShexCleared] = useState('');
+  const [inlineSvg, setInlineSvg] = useState('');
 
   const handleShexInputChange = (e) => {
     setShexInput(e.target.value);
   };
 
-  const parseShexInput = () => {
-    try {
-      console.log(shumlex.checkLink("probando! por favor funciona!!!"));
-      const yasheValue = editorRef.current.getYasheValue();
-      const xmi = shumlex.shExToXMI(yasheValue);
-      const plantuml = shumlex.crearMUML(xmi);
-      setParseResult(plantuml);
-      let filteredPlantuml = plantuml.replace(/classDiagram\n/, '');
-      filteredPlantuml = filteredPlantuml.replace(/class Prefixes \{[^}]+\}\n?/, '');
+  const extractLogicShapes = (shex) => {
+    // Expresión regular para capturar las shapes lógicas
+    const shapeRegex = /:\w+\s+(NOT\s+)?(:\w+\s*(?:AND|OR|NOT|AND\s+NOT|OR\s+NOT)\s*)*:\w+/gi;
 
-      setParseResult(filteredPlantuml);
-      // console.log(yashe.getValue()) ???
-    } catch (error) {
-      console.error("Error al parsear ShEx:", error);
-      setParseResult("Error al parsear el código ShEx. Ver console para detalles.");
-    }
+    // Buscar todas las coincidencias en el string shex
+    const matches = shex.match(shapeRegex);
+
+    const cleanedShex = shex.replace(shapeRegex, '').trim();
+    setShexCleared(cleanedShex);
+
+    // Devolver el array con las shapes encontradas
+
+    console.log("shapes sacadas--------------------------------->");
+        console.log(matches);
+
+    return matches || [];
   };
 
+  useEffect(() => {
+    // Función para parsear el input de ShEx
+    const parseShexInput = () => {
+      try {
+        const yasheValue = editorRef.current.getYasheValue();
+        extractLogicShapes(yasheValue);
+
+        //Generar XMI con valor del yashe
+        // const xmi = shumlex.shExToXMI(yasheValue);
+
+        //Generar XMI con shapes lógicas quitadas
+        const xmi = shumlex.shExToXMI(shexCleared);
+        
+        // Generar PlantUML a partir del XMI
+        // const plantuml = shumlex.crearMUML(xmi);
+        
+        // shumlex.crearDiagramaUML("svgid",xmi);
+        
+        // Crear UML con Mermeid a través de Shumlex
+        shumlex.crearDiagramaUML('svgid', xmi);
+
+        //  Filtrar el resultado de PlantUML
+        //  let filteredPlantuml = plantuml.replace(/classDiagram\n/, '');
+        //  filteredPlantuml = filteredPlantuml.replace(/class Prefixes \{[^}]+\}\n?/, '');
+        //  filteredPlantuml = filteredPlantuml.replace(/class Enum\d+ \{[^}]+\}\n?/g, '');
+
+        // console.log("PlantUML filteredPlantuml generado:", filteredPlantuml);
+        
+      
+        // // Actualizar el estado con el resultado filtrado
+        // setParseResult(filteredPlantuml);
+
+
+        // console.log(svg64);
+
+      } catch (error) {
+        console.error("Error al parsear ShEx:", error);
+        setParseResult("Error al parsear el código ShEx. Ver console para detalles.");
+      }
+    };
+
+    // Llamar a parseShexInput cuando shexCleared cambie
+    if (shexCleared !== '') {
+      parseShexInput();
+    }
+  }, [shexCleared]);
+
   return (
-    <div className='editor-container'>
+    <>
       <h1>ShEx Parser</h1>
       <div className='editor'>
-      <EditorYashe ref={editorRef} />
+        <EditorYashe ref={editorRef} />
       </div>
-      <button className='button-20' onClick={parseShexInput}>Ver Diagrama</button>
-
+      <button className='button-20' onClick={() => extractLogicShapes(editorRef.current.getYasheValue())}>
+        Ver Diagrama
+      </button>
       <div className="parse-result-container">
         
       </div>
-      {parseResult && <InteractiveDiagram diagramSource={parseResult} />}
-      
-    </div>
+
+        {/* <svg id="svgid"></svg> */}
+      {/* {parseResult && <Diagram diagramSource={parseResult} />} */}
+    </>
   );
 }
 

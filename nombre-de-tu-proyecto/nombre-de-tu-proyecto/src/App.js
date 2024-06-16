@@ -8,6 +8,7 @@ function App() {
     <div className="app">
       <h1>System to visualize RDF data Shapes Schemas</h1>
       <Editor></Editor>
+      <div id="svgid"></div>
     </div>
   );
 }

@@ -14,6 +14,7 @@
     "react-dom": "^18.3.1",
     "react-scripts": "4.0.3",
     "shex": "^1.0.0-alpha.29",
+    "shumlex": "^0.6.5",
     "util": "^0.12.5",
     "web-vitals": "^2.1.4",
     "yashe": "^1.3.22"
