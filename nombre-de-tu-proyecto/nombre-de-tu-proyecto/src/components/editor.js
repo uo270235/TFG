@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './editor.css';
 import EditorYashe from './yashe';
 import shumlex from 'shumlex';
-
+import PlantUMLParser from '../parserShapes';
 
 function Editor() {
   const editorRef = useRef(null);
@@ -39,6 +39,12 @@ function Editor() {
     console.log("shapes sacadas--------------------------------->");
         console.log(matches);
 
+
+        const parser = new PlantUMLParser(matches);
+        const plantUMLCode = parser.parse();
+        console.log("-------------PLANTUM GENERADO--------------------------------->");
+        console.log(plantUMLCode);
+
     return matches || [];
   };
 
@@ -47,7 +53,7 @@ function Editor() {
     const parseShexInput = () => {
       try {
         const yasheValue = editorRef.current.getYasheValue();
-        extractLogicShapes(yasheValue);
+        // extractLogicShapes(yasheValue);
 
         //Generar XMI con valor del yashe
         // const xmi = shumlex.shExToXMI(yasheValue);
@@ -64,7 +70,7 @@ function Editor() {
         shumlex.crearDiagramaUML('svgid', xmi);
 
         //  Filtrar el resultado de PlantUML
-        //  let filteredPlantuml = plantuml.replace(/classDiagram\n/, '');
+         // let filteredPlantuml = plantuml.replace(/classDiagram\n/, '');
         //  filteredPlantuml = filteredPlantuml.replace(/class Prefixes \{[^}]+\}\n?/, '');
         //  filteredPlantuml = filteredPlantuml.replace(/class Enum\d+ \{[^}]+\}\n?/g, '');
 
