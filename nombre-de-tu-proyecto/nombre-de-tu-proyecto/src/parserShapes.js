@@ -3,6 +3,7 @@ class PlantUMLParser {
     this.shapes = shapes;
     this.componentCounter = 0;
     this.uml = `@startuml
+    allowmixing
     skinparam component {
     BackgroundColor<<AND>> #1E3A8A
     BorderColor<<AND>> #60A5FA
@@ -90,13 +91,13 @@ class PlantUMLParser {
         const declaredComponents = new Set();
     
         // Declarar el mainEntity como un rectángulo
-        this.uml += `rectangle ${mainEntity}\n`;
+        this.uml += `class ${mainEntity}{}\n`;
         declaredComponents.add(mainEntity);
     
         // Declarar todos los componentes como rectángulos primero
         stack.forEach(component => {
             if (component !== 'AND' && component !== 'OR' && component !== 'NOT' && !declaredComponents.has(component)) {
-                this.uml += `rectangle ${component}\n`;
+                this.uml += `class ${component}{}\n`;
                 declaredComponents.add(component);
             }
         });
@@ -136,6 +137,8 @@ class PlantUMLParser {
         return this.uml;
     }
     }
+
+    
     
     // Exportar la clase
     module.exports = PlantUMLParser;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import shumlex from 'shumlex'; // Ensure correct import path
+import shumlex from 'shumlex'; 
 
 const MermeidDiagram = ({ diagramSource }) => {
 

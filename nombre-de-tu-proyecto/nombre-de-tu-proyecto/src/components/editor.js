@@ -45,15 +45,16 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
     // Expresión regular para capturar las shapes lógicas
     const shapeRegex = /:\w+\s+(NOT\s+)?(:\w+\s*(?:AND|OR|NOT|AND\s+NOT|OR\s+NOT)\s*)*:\w+/gi;
 
-    // Buscar todas las coincidencias en el string shex
+    // Buscamos las Shape Lógicas y las almacenamos. Además se borran del shex
     const matches = shex.match(shapeRegex);
-
     const cleanedShex = shex.replace(shapeRegex, '').trim();
     setShexCleared(cleanedShex);
 
     // Devolver el array con las shapes encontradas
     console.log("shapes sacadas--------------------------------->");
     console.log(matches);
+
+    // const classUML_F = shumlex.crearMUML(cleanedShex);
 
     const parser = new PlantUMLParser(matches);
     const plantUMLCodeGenerated = parser.parse();
