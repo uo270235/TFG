@@ -18,20 +18,22 @@ function Editor() {
       const example = `prefix : <http://example.org/>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 
-:Usuario :Hombre and :Mujer or :kokin
-
-:Usuaria not :kokin
+:Usuario :Hombre OR :Mujer AND NOT :Perro 
 
 :Hombre {
-  :genero [ :Masculino ]
+  :genero [ :Masculino ];
+  :mascota @:Perro *;
+  :mujer @:Mujer;
 }
 
 :Mujer {
-  :genero [ :Femenino ]
+  :genero [ :Femenino ];
+  :marido @:Hombre ; 
+  :mascota @:Perro *
 }
 
-:Kokin{
-  :genero [ :Neutro ]
+:Perro {
+  :capacidad [ :ladrar ]
 }
 `;
       editorRef.current.setYasheValue(example);
@@ -54,9 +56,10 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
     console.log("shapes sacadas--------------------------------->");
     console.log(matches);
 
-    // const classUML_F = shumlex.crearMUML(cleanedShex);
+    let xmi = shumlex.shExToXMI(cleanedShex);
+    let classUML_F = shumlex.crearMUML(xmi);
 
-    const parser = new PlantUMLParser(matches);
+    const parser = new PlantUMLParser(matches,classUML_F);
     const plantUMLCodeGenerated = parser.parse();
     console.log("-------------PLANTUM GENERADO--------------------------------->");
     console.log(plantUMLCodeGenerated);
