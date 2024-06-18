@@ -54,17 +54,17 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
       const cleanedShex = shex.replace(shapeRegex, '').trim();
       setShexCleared(cleanedShex);
 
-      // Devolver el array con las shapes encontradas
-      //console.log("shapes sacadas--------------------------------->");
-      //console.log(matches);
+      // No es un error si no se encuentran shapes lógicas
+      if (!matches) {
+        setPlantUMLCode('');
+        return [];
+      }
 
       let xmi = shumlex.shExToXMI(cleanedShex);
       let classUML_F = shumlex.crearMUML(xmi);
 
       const parser = new PlantUMLParser(matches, classUML_F);
       const plantUMLCodeGenerated = parser.parse();
-      //console.log("-------------PLANTUM GENERADO--------------------------------->");
-      //console.log(plantUMLCodeGenerated);
 
       setPlantUMLCode(plantUMLCodeGenerated);
       setParseError(null); // Limpiar cualquier error previo
