@@ -72,7 +72,16 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
     } catch (error) {
       console.error("Error al parsear ShEx:", error);
       setParseError(error.message); // Establecer el error en el estado
+      setPlantUMLCode(''); // Limpiar el diagrama en caso de error
+      setShexCleared(''); // Limpiar shexCleared en caso de error
       return null;
+    }
+  };
+
+  const clearMermaidDiagram = () => {
+    const mermaidContainer = document.getElementById('mermaid-diagram');
+    if (mermaidContainer) {
+      mermaidContainer.innerHTML = ''; // Limpiar el contenido del contenedor Mermaid
     }
   };
 
@@ -87,13 +96,16 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
         // Generar XMI con shapes lógicas quitadas
         const xmi = shumlex.shExToXMI(shexCleared);
 
-        // Crear UML con Mermeid a través de Shumlex
-        shumlex.crearDiagramaUML('svgid', xmi);
-        shumlex.asignarEventos('svgid');
-
+        // Crear UML con Mermaid a través de Shumlex
+        shumlex.crearDiagramaUML('mermaid-diagram', xmi);
+        shumlex.asignarEventos('mermaid-diagram');
+        
       } catch (error) {  
         console.error("Error al parsear ShEx:", error);
         setParseError(error.message); // Establecer el error en el estado
+        setPlantUMLCode(''); // Limpiar el diagrama en caso de error
+        clearMermaidDiagram(); // Limpiar el diagrama Mermaid en caso de error
+        setShexCleared(''); // Limpiar shexCleared en caso de error
       }
     };
 
@@ -118,11 +130,15 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
         } catch (error) {
           console.error("Error al parsear ShEx:", error);
           setParseError(error.message);
+          setPlantUMLCode(''); 
+          clearMermaidDiagram(); // Limpiar el diagrama Mermaid en caso de error
+          setShexCleared(''); // Limpiar shexCleared en caso de error
         }
       }}>
         Ver Diagrama
       </button>
       {plantUMLCode && <Diagram diagramSource={plantUMLCode} />}
+      <div className="diagram-container" id="mermaid-diagram"></div>
       {parseError && (
         <Alerta mensaje={`Error al parsear ShEx: ${parseError}`} onClose={() => setParseError(null)} />
       )}
