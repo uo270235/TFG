@@ -1,0 +1,32 @@
+/* Alerta.css */
+.alerta {
+    padding: 20px;
+    background-color: #f44336; /* Red */
+    color: white;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    position: fixed;
+    top: auto; /* Desactiva el top */
+    bottom: 550px; /* Ajusta esto según sea necesario para colocarlo encima del YASHE */
+    right: 400px;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Cambiar de center a flex-start para que la cruz esté más arriba */
+  }
+  
+  .alerta-mensaje {
+    flex: 1;
+  }
+  
+  .alerta-cerrar {
+    background: none;
+    border: none;
+    color: rgb(9, 9, 4); /* Cambiar a un color más llamativo */
+    font-size: 25px; /* Aumentar el tamaño de la fuente */
+    font-weight: bold; /* Hacer que la cruz sea más gruesa */
+    cursor: pointer;
+    margin-left: 20px;
+    align-self: flex-start; /* Alinear la cruz más arriba */
+  }
+  
