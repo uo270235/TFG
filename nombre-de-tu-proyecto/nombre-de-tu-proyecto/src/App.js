@@ -7,6 +7,7 @@ function App() {
   return (
     <div className="app">
       <NavBar></NavBar>
+      <h1 className="page-title">Schema (ShEx)</h1>
       <Editor></Editor>
       <div id="svgid"></div>
     </div>
