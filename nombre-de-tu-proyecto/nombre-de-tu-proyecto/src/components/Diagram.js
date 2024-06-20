@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const Diagram = ({ diagramSource }) => {
+const Diagram = ({ diagramSource, onSvgGenerated }) => {
   const [diagram, setDiagram] = useState('');
 
   useEffect(() => {
@@ -13,10 +13,15 @@ const Diagram = ({ diagramSource }) => {
         body: diagramSource
       })
         .then(response => response.text())
-        .then(svg => setDiagram(svg))
+        .then(svg => {
+          setDiagram(svg);
+          if (onSvgGenerated) {
+            onSvgGenerated(svg); // Call the callback with the SVG content
+          }
+        })
         .catch(error => console.error('Error generating diagram:', error));
     }
-  }, [diagramSource]);
+  }, [diagramSource, onSvgGenerated]);
 
   return (
     <div className="diagram-container">

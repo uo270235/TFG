@@ -4,7 +4,7 @@ import EditorYashe from './yashe';
 import shumlex from 'shumlex';
 import PlantUMLParser from '../parserShapes';
 import Diagram from './Diagram';
-import Alerta from './Alerta'; // Importa el componente de alerta
+import Alerta from './Alerta';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
@@ -12,10 +12,12 @@ function Editor() {
   const editorRef = useRef(null);
   const [shexCleared, setShexCleared] = useState('');
   const [plantUMLCode, setPlantUMLCode] = useState('');
-  const [parseError, setParseError] = useState(null); // Nuevo estado para manejar el error
+  const [parseError, setParseError] = useState(null);
+  const [krokiSvg, setKrokiSvg] = useState(''); 
+  const [isMermaidDiagramVisible, setIsMermaidDiagramVisible] = useState(false);
+  const [isKrokiDiagramVisible, setIsKrokiDiagramVisible] = useState(false);
 
   useEffect(() => {
-    // WORKAROUND: Solución temporal a bug en librería Yashe (actualmente genera dos editores)
     const yashes = document.querySelectorAll('.yashe');
     if (yashes.length > 1) {
       yashes[0].remove();
@@ -48,17 +50,14 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 
   const extractLogicShapes = (shex) => {
     try {
-      // Expresión regular para capturar las shapes lógicas
       const shapeRegex = /:\w+\s+(NOT\s+)?(:\w+\s*(?:AND|OR|NOT|AND\s+NOT|OR\s+NOT)\s*)*:\w+/gi;
-
-      // Buscamos las Shape Lógicas y las almacenamos. Además se borran del shex
       const matches = shex.match(shapeRegex);
       const cleanedShex = shex.replace(shapeRegex, '').trim();
       setShexCleared(cleanedShex);
 
-      // No es un error si no se encuentran shapes lógicas
       if (!matches) {
         setPlantUMLCode('');
+        setIsKrokiDiagramVisible(false);
         return [];
       }
 
@@ -69,13 +68,15 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
       const plantUMLCodeGenerated = parser.parse();
 
       setPlantUMLCode(plantUMLCodeGenerated);
-      setParseError(null); // Limpiar cualquier error previo
+      setParseError(null);
+      setIsKrokiDiagramVisible(true);
       return matches || [];
     } catch (error) {
       console.error("Error al parsear ShEx:", error);
-      setParseError(error.message); // Establecer el error en el estado
-      setPlantUMLCode(''); // Limpiar el diagrama en caso de error
-      setShexCleared(''); // Limpiar shexCleared en caso de error
+      setParseError(error.message);
+      setPlantUMLCode('');
+      setShexCleared('');
+      setIsKrokiDiagramVisible(false);
       return null;
     }
   };
@@ -83,18 +84,14 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
   const clearMermaidDiagram = () => {
     const mermaidContainer = document.getElementById('mermaid-diagram');
     if (mermaidContainer) {
-      mermaidContainer.innerHTML = ''; // Limpiar el contenido del contenedor Mermaid
+      mermaidContainer.innerHTML = '';
+      setIsMermaidDiagramVisible(false);
     }
   };
 
-
-  
-  const downloadDiagram = (id, filename) => {
-    const svgElement = document.querySelector(`#${id} svg`);
-    if (svgElement) {
-      const serializer = new XMLSerializer();
-      const svgString = serializer.serializeToString(svgElement);
-      const blob = new Blob([svgString], { type: 'image/svg+xml' });
+  const downloadDiagram = (svgContent, filename) => {
+    if (svgContent) {
+      const blob = new Blob([svgContent], { type: 'image/svg+xml' });
       const url = URL.createObjectURL(blob);
       
       const link = document.createElement('a');
@@ -105,32 +102,33 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } else {
-      console.error('No SVG element found.');
+      console.error('No Relational UML diagram content available.');
     }
   };
 
+  const downloadKrokiDiagram = () => {
+    if (krokiSvg) {
+      downloadDiagram(krokiSvg, 'diagramLogicUMLClass');
+    } else {
+      console.error('No Logic UML diagram content available.');
+    }
+  };
 
   useEffect(() => {
     const parseShexInput = () => {
       try {
         const yasheValue = editorRef.current.getYasheValue();
-
-        // Validar ShEx con shumlex.shExToXMI(yasheValue)
-        shumlex.shExToXMI(yasheValue); 
-
-        // Generar XMI con shapes lógicas quitadas
+        shumlex.shExToXMI(yasheValue);
         const xmi = shumlex.shExToXMI(shexCleared);
-
-        // Crear UML con Mermaid a través de Shumlex
         shumlex.crearDiagramaUML('mermaid-diagram', xmi);
         shumlex.asignarEventos('mermaid-diagram');
-        
+        setIsMermaidDiagramVisible(true);
       } catch (error) {  
         console.error("Error al parsear ShEx:", error);
-        setParseError(error.message); // Establecer el error en el estado
-        setPlantUMLCode(''); // Limpiar el diagrama en caso de error
-        clearMermaidDiagram(); // Limpiar el diagrama Mermaid en caso de error
-        setShexCleared(''); // Limpiar shexCleared en caso de error
+        setParseError(error.message);
+        setPlantUMLCode('');
+        clearMermaidDiagram();
+        setShexCleared('');
       }
     };
 
@@ -147,7 +145,7 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
       <button className='button-20' onClick={() => {
         const yasheValue = editorRef.current.getYasheValue();
         try {
-          shumlex.shExToXMI(yasheValue); // Validar primero
+          shumlex.shExToXMI(yasheValue);
           const result = extractLogicShapes(yasheValue);
           if (result !== null) {
             console.log("Shapes extraídas y procesadas correctamente.");
@@ -155,21 +153,29 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
         } catch (error) {
           console.error("Error al parsear ShEx:", error);
           setParseError(error.message);
-          setPlantUMLCode(''); 
-          clearMermaidDiagram(); // Limpiar el diagrama Mermaid en caso de error
-          setShexCleared(''); // Limpiar shexCleared en caso de error
+          setPlantUMLCode('');
+          clearMermaidDiagram();
+          setShexCleared('');
         }
       }}>
         Ver Diagrama
       </button>
-      {plantUMLCode && <Diagram diagramSource={plantUMLCode} />}
+      {plantUMLCode && <Diagram diagramSource={plantUMLCode} onSvgGenerated={setKrokiSvg} />}
       <div className="diagram-container" id="mermaid-diagram"></div>
       {parseError && (
         <Alerta mensaje={`Error al parsear ShEx: ${parseError}`} onClose={() => setParseError(null)} />
       )}
 
-<button onClick={() => downloadDiagram('mermaid-diagram', 'diagram')}>Descargar Diagrama de Clases</button>
-
+      {isMermaidDiagramVisible && (
+        <button onClick={() => downloadDiagram(document.getElementById('mermaid-diagram').innerHTML, 'diagramUMLRelationalClass')}>
+          Descargar Diagrama de Clases
+        </button>
+      )}
+      {isKrokiDiagramVisible && (
+        <button onClick={downloadKrokiDiagram}>
+          Descargar Diagrama LogicShapes
+        </button>
+      )}
     </>
   );
 }
