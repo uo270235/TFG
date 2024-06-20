@@ -35,7 +35,6 @@ h1 {
   margin-bottom: 20px;
   padding: 15px;
   font-size: 16px;
-  border: 2px solid #ccc;
   border-radius: 5px;
   outline: none;
   resize: none;
@@ -46,6 +45,10 @@ h1 {
 .editor:focus {
   border-color: #007bff;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.editor-buttons{
+  text-align: right;
 }
 
 .button-20 {
@@ -59,24 +62,24 @@ h1 {
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin-bottom: 20px;
-  margin: auto;
 }
 
 .button-20:hover {
   background-color: #0056b3;
 }
 
+
 .diagram-container {
+  position: relative;
   border: 1px solid #ccc;
   padding: 10px;
-  margin-top: 20px;
-  overflow: auto;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-}
+  margin: 20px 0;
+  max-height: 400px; 
+} 
+
 
 .diagram-container svg {
-  max-width: 100%;
+  max-width: 60%;
 }
 
 h2 {
@@ -95,4 +98,30 @@ pre {
   overflow-x: auto;
   height: 100%;
   margin: 0;
+}
+
+.result-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.buttons-container{
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.download-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.download-icon:hover {
+  color: #007bff;
 }

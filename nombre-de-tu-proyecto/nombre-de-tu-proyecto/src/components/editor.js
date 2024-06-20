@@ -7,6 +7,7 @@ import Diagram from './Diagram';
 import Alerta from './Alerta';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { FaDownload } from 'react-icons/fa';
 
 function Editor() {
   const editorRef = useRef(null);
@@ -140,42 +141,53 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
   return (
     <>
       <div className='editor'>
+        <h1 className="page-title">Schema (ShEx)</h1>
         <EditorYashe ref={editorRef} />
+        <div className='editor-buttons'>
+          <button className='button-20' onClick={() => {
+              const yasheValue = editorRef.current.getYasheValue();
+              try {
+                shumlex.shExToXMI(yasheValue);
+                const result = extractLogicShapes(yasheValue);
+                if (result !== null) {
+                  console.log("Shapes extraídas y procesadas correctamente.");
+                }
+              } catch (error) {
+                console.error("Error al parsear ShEx:", error);
+                setParseError(error.message);
+                setPlantUMLCode('');
+                clearMermaidDiagram();
+                setShexCleared('');
+              }
+            }}>
+            Ver Diagrama
+          </button>
+        </div>
+
+        <div className="result-container">
+          {plantUMLCode && 
+          <div className="diagram-container" data-zoom-on-wheel="zoom-amount: 0.01; min-scale: 0.3; max-scale: 20;" data-pan-on-drag>
+            <Diagram diagramSource={plantUMLCode} onSvgGenerated={setKrokiSvg} />
+            {isKrokiDiagramVisible && (
+              <button className='download-icon' onClick={downloadKrokiDiagram}>
+                <FaDownload />
+              </button>
+            )}
+          </div>}
+          <div className="diagram-container" data-zoom-on-wheel="zoom-amount: 0.01; min-scale: 0.3; max-scale: 20;" data-pan-on-drag>
+            <div id="mermaid-diagram"></div>
+            {isMermaidDiagramVisible && (
+              <button className='download-icon' onClick={() => downloadDiagram(document.getElementById('mermaid-diagram').innerHTML, 'diagramUMLRelationalClass')}>
+                <FaDownload />
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-      <button className='button-20' onClick={() => {
-        const yasheValue = editorRef.current.getYasheValue();
-        try {
-          shumlex.shExToXMI(yasheValue);
-          const result = extractLogicShapes(yasheValue);
-          if (result !== null) {
-            console.log("Shapes extraídas y procesadas correctamente.");
-          }
-        } catch (error) {
-          console.error("Error al parsear ShEx:", error);
-          setParseError(error.message);
-          setPlantUMLCode('');
-          clearMermaidDiagram();
-          setShexCleared('');
-        }
-      }}>
-        Ver Diagrama
-      </button>
-      {plantUMLCode && <Diagram diagramSource={plantUMLCode} onSvgGenerated={setKrokiSvg} />}
-      <div className="diagram-container" id="mermaid-diagram"></div>
       {parseError && (
         <Alerta mensaje={`Error al parsear ShEx: ${parseError}`} onClose={() => setParseError(null)} />
       )}
-
-      {isMermaidDiagramVisible && (
-        <button onClick={() => downloadDiagram(document.getElementById('mermaid-diagram').innerHTML, 'diagramUMLRelationalClass')}>
-          Descargar Diagrama de Clases
-        </button>
-      )}
-      {isKrokiDiagramVisible && (
-        <button onClick={downloadKrokiDiagram}>
-          Descargar Diagrama LogicShapes
-        </button>
-      )}
+      
     </>
   );
 }

@@ -16,7 +16,7 @@ const Diagram = ({ diagramSource, onSvgGenerated }) => {
         .then(svg => {
           setDiagram(svg);
           if (onSvgGenerated) {
-            onSvgGenerated(svg); // Call the callback with the SVG content
+            onSvgGenerated(svg); 
           }
         })
         .catch(error => console.error('Error generating diagram:', error));
@@ -24,9 +24,7 @@ const Diagram = ({ diagramSource, onSvgGenerated }) => {
   }, [diagramSource, onSvgGenerated]);
 
   return (
-    <div className="diagram-container">
       <div dangerouslySetInnerHTML={{ __html: diagram }} />
-    </div>
   );
 };
 
