@@ -5,6 +5,8 @@ import shumlex from 'shumlex';
 import PlantUMLParser from '../parserShapes';
 import Diagram from './Diagram';
 import Alerta from './Alerta'; // Importa el componente de alerta
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 function Editor() {
   const editorRef = useRef(null);
@@ -85,6 +87,29 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
     }
   };
 
+
+  
+  const downloadDiagram = (id, filename) => {
+    const svgElement = document.querySelector(`#${id} svg`);
+    if (svgElement) {
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(svgElement);
+      const blob = new Blob([svgString], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${filename}.svg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } else {
+      console.error('No SVG element found.');
+    }
+  };
+
+
   useEffect(() => {
     const parseShexInput = () => {
       try {
@@ -142,6 +167,9 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
       {parseError && (
         <Alerta mensaje={`Error al parsear ShEx: ${parseError}`} onClose={() => setParseError(null)} />
       )}
+
+<button onClick={() => downloadDiagram('mermaid-diagram', 'diagram')}>Descargar Diagrama de Clases</button>
+
     </>
   );
 }
