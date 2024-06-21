@@ -140,6 +140,7 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 
   return (
     <>
+    <div class="container">
       <div className='editor'>
         <h1 className="page-title">Schema (ShEx)</h1>
         <EditorYashe ref={editorRef} />
@@ -163,31 +164,33 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
             Ver Diagrama
           </button>
         </div>
-
-        <div className="result-container">
+           </div>
+           {parseError && (
+        <Alerta mensaje={`Error al parsear ShEx: ${parseError}`} onClose={() => setParseError(null)} />
+      )}
+              <div className="result-container">
           {plantUMLCode && 
-          <div className="diagram-container" data-zoom-on-wheel="zoom-amount: 0.01; min-scale: 0.3; max-scale: 20;" data-pan-on-drag>
+          <div className="diagram-container kroki-diagram" data-zoom-on-wheel="zoom-amount: 0.01; min-scale: 0.3; max-scale: 20;" data-pan-on-drag>
             <Diagram diagramSource={plantUMLCode} onSvgGenerated={setKrokiSvg} />
+            <div className='icon-container'>
             {isKrokiDiagramVisible && (
               <button className='download-icon' onClick={downloadKrokiDiagram}>
                 <FaDownload />
               </button>
             )}
+            </div>
           </div>}
-          <div className="diagram-container" data-zoom-on-wheel="zoom-amount: 0.01; min-scale: 0.3; max-scale: 20;" data-pan-on-drag>
-            <div id="mermaid-diagram"></div>
+          <div className={isMermaidDiagramVisible ? (isKrokiDiagramVisible ? "diagram-container mermaid-diagram" : "diagram-container only-mermaid") : ""} data-zoom-on-wheel="zoom-amount: 0.01; min-scale: 0.3; max-scale: 20;" data-pan-on-drag>
+          <div id="mermaid-diagram"></div>
             {isMermaidDiagramVisible && (
               <button className='download-icon' onClick={() => downloadDiagram(document.getElementById('mermaid-diagram').innerHTML, 'diagramUMLRelationalClass')}>
                 <FaDownload />
               </button>
+              
             )}
           </div>
         </div>
       </div>
-      {parseError && (
-        <Alerta mensaje={`Error al parsear ShEx: ${parseError}`} onClose={() => setParseError(null)} />
-      )}
-      
     </>
   );
 }
