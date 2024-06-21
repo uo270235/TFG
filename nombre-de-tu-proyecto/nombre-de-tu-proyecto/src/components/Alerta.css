@@ -1,0 +1,32 @@
+.alerta {
+  padding: 20px;
+  background-color: #f44336;
+  color: white;
+  border-radius: 4px;
+  position: absolute; /* Cambiar a absolute */
+  left: 50%; /* Centrar horizontalmente */
+  top: 0; /* Colocar en la parte superior */
+  transform: translateX(-50%); /* Ajustar el centrado horizontal */
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 6rem;
+}
+
+  
+  .alerta-mensaje {
+    flex: 1;
+  }
+  
+  .alerta-cerrar {
+    background: none;
+    border: none;
+    color: rgb(9, 9, 4); /* Cambiar a un color más llamativo */
+    font-size: 25px; /* Aumentar el tamaño de la fuente */
+    font-weight: bold; /* Hacer que la cruz sea más gruesa */
+    cursor: pointer;
+    margin-left: 20px;
+    align-self: flex-start; /* Alinear la cruz más arriba */
+  }
+  
